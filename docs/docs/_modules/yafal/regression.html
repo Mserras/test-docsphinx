@@ -1,0 +1,376 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>yafal.regression &#8212; YAFAL: You Are Fake Labels!  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bizstyle.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">YAFAL: You Are Fake Labels!  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">yafal.regression</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for yafal.regression</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">RandomSampler</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+
+<span class="kn">from</span> <span class="nn">yafal.corruption</span> <span class="kn">import</span> <span class="n">DatasetCorruptor</span>
+<span class="kn">from</span> <span class="nn">yafal.label</span> <span class="kn">import</span> <span class="n">YAFALLabelEncoder</span>
+<span class="kn">from</span> <span class="nn">yafal.models</span> <span class="kn">import</span> <span class="n">YAFALDataset</span>
+<span class="kn">from</span> <span class="nn">.binary</span> <span class="kn">import</span> <span class="n">BinaryYAFAL</span>
+<span class="kn">from</span> <span class="nn">.semantic</span> <span class="kn">import</span> <span class="n">SemanticYAFAL</span>
+
+
+<div class="viewcode-block" id="YAFALTorchDataset"><a class="viewcode-back" href="../../sections/main_classes.html#yafal.YAFALTorchDataset">[docs]</a><span class="k">class</span> <span class="nc">YAFALTorchDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">YAFALDataset</span><span class="p">,</span>
+                 <span class="n">label_encoder</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+                 <span class="n">label_transform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;binary&quot;</span><span class="p">,</span>
+                 <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Torch handler for the YAFAL dataset class to be used by a Torch data handler</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        :param dataset:</span>
+<span class="sd">        :param label_transform: Callable</span>
+<span class="sd">            method to transform</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_transform</span> <span class="o">=</span> <span class="n">label_transform</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_encoder</span> <span class="o">=</span> <span class="n">label_encoder</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">samples</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">add_sample</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">samples</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_transform</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+            <span class="n">original_label_transform</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label_encoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">index</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">original_label_transform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_encoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">index</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">label_to_predict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">is_corrupted</span><span class="p">[</span><span class="n">index</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">sample</span><span class="p">,</span> <span class="n">original_label_transform</span><span class="p">,</span> <span class="n">label_to_predict</span></div>
+
+
+<div class="viewcode-block" id="YAFALRegression"><a class="viewcode-back" href="../../sections/main_classes.html#yafal.YAFALRegression">[docs]</a><span class="k">class</span> <span class="nc">YAFALRegression</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_encoder_method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">corrupt_percentage</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
+                 <span class="n">keep_original</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">n_rounds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="n">max_labels_to_corrupt</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">validation_corpus_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+                 <span class="n">max_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+                 <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+                 <span class="n">freeze_label_encoder</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">freeze_sequence_encoder</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">early_stopping</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">patience</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">yafal_kwargs</span><span class="p">:</span> <span class="n">Dict</span>
+                 <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        :param label_encoder_method:</span>
+<span class="sd">        :param corrupt_percentage:</span>
+<span class="sd">        :param keep_original:</span>
+<span class="sd">        :param n_rounds:</span>
+<span class="sd">        :param max_labels_to_corrupt:</span>
+<span class="sd">        :param validation_corpus_ratio:</span>
+<span class="sd">        :param max_epochs:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_yafal_kwargs</span> <span class="o">=</span> <span class="n">yafal_kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_encoder</span> <span class="o">=</span> <span class="n">YAFALLabelEncoder</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_corruptor</span> <span class="o">=</span> <span class="n">DatasetCorruptor</span><span class="p">(</span><span class="n">probability</span><span class="o">=</span><span class="n">corrupt_percentage</span><span class="p">,</span> <span class="n">keep_original</span><span class="o">=</span><span class="n">keep_original</span><span class="p">,</span>
+                                                   <span class="n">n_rounds</span><span class="o">=</span><span class="n">n_rounds</span><span class="p">,</span> <span class="n">max_labels_to_corrupt</span><span class="o">=</span><span class="n">max_labels_to_corrupt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoding_method</span> <span class="o">=</span> <span class="n">label_encoder_method</span>
+        <span class="k">if</span> <span class="n">label_encoder_method</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__model_loader</span> <span class="o">=</span> <span class="n">BinaryYAFAL</span>
+        <span class="k">elif</span> <span class="n">label_encoder_method</span> <span class="o">==</span> <span class="s2">&quot;semantic&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__model_loader</span> <span class="o">=</span> <span class="n">SemanticYAFAL</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Label encoding method should be either &#39;binary&#39; or &#39;semantic&#39;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Training parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_val_ratio</span> <span class="o">=</span> <span class="n">validation_corpus_ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_epochs</span> <span class="o">=</span> <span class="n">max_epochs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_freeze_encoder</span> <span class="o">=</span> <span class="n">freeze_label_encoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_freeze_sequence_encoder</span> <span class="o">=</span> <span class="n">freeze_sequence_encoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_do_early_stopping</span> <span class="o">=</span> <span class="n">early_stopping</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_patience</span> <span class="o">=</span> <span class="n">patience</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_best_model_state_dict</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">vprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+            <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">YAFALDataset</span><span class="p">,</span>
+            <span class="n">descriptors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">train_losses</span><span class="p">,</span> <span class="n">valid_losses</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="n">avg_train_losses</span><span class="p">,</span> <span class="n">avg_valid_losses</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+
+        <span class="c1"># Fit the label encoder</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding_method</span> <span class="o">==</span> <span class="s2">&quot;semantic&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">descriptors</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Semantic label encoding was selected but no encoding method was provided&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_label_encoder</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">label_list</span><span class="p">,</span> <span class="n">descriptors</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_encoder</span><span class="o">.</span><span class="n">validate_descriptions</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Some of the labels do not have any descriptor&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__model_loader</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_yafal_kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__freeze_label_encoder</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_label_encoder</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">label_list</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__model_loader</span><span class="p">(</span><span class="n">label_encoding_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_encoder</span><span class="o">.</span><span class="n">label_indexes</span><span class="p">),</span>
+                                             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_yafal_kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__freeze_encoder</span><span class="p">()</span>
+
+        <span class="c1"># Split in train and validation sets</span>
+        <span class="n">x_train</span><span class="p">,</span> <span class="n">x_validation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_train_val</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Corrupt the datasets</span>
+        <span class="n">x_train_corrupt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_corruptor</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">=</span><span class="n">x_train</span>
+        <span class="p">)</span>
+        <span class="n">x_val_corrupt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_corruptor</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">=</span><span class="n">x_validation</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Start the training</span>
+        <span class="n">torch_data_handler</span> <span class="o">=</span> <span class="n">YAFALTorchDataset</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">x_train_corrupt</span><span class="p">,</span>
+                                               <span class="n">label_encoder</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_encoder</span><span class="o">.</span><span class="n">transform</span> <span class="k">if</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">encoding_method</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_encoder</span><span class="o">.</span><span class="n">describe</span><span class="p">,</span>
+                                               <span class="n">label_transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding_method</span><span class="p">)</span>
+
+        <span class="n">torch_validation_data_handler</span> <span class="o">=</span> <span class="n">YAFALTorchDataset</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">x_val_corrupt</span><span class="p">,</span>
+                                                          <span class="n">label_encoder</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_label_encoder</span><span class="o">.</span><span class="n">transform</span> <span class="k">if</span>
+                                                          <span class="bp">self</span><span class="o">.</span><span class="n">encoding_method</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span>
+                                                          <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_encoder</span><span class="o">.</span><span class="n">describe</span><span class="p">,</span>
+                                                          <span class="n">label_transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding_method</span><span class="p">)</span>
+
+        <span class="n">train_data_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">torch_data_handler</span><span class="p">,</span>  <span class="c1"># The training samples.</span>
+            <span class="n">sampler</span><span class="o">=</span><span class="n">RandomSampler</span><span class="p">(</span><span class="n">torch_data_handler</span><span class="p">),</span>  <span class="c1"># Select batches randomly</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_batch_size</span>  <span class="c1"># Trains with this batch size.</span>
+        <span class="p">)</span>
+
+        <span class="n">val_data_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">torch_validation_data_handler</span><span class="p">,</span>  <span class="c1"># The training samples.</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_batch_size</span>  <span class="c1"># Trains with this batch size.</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Use it for training</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
+
+        <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCELoss</span><span class="p">()</span>  <span class="c1"># Binary Cross Entropy Loss for 0/1 regression</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.004</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="n">remaining_patience</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_patience</span>
+        <span class="n">best_loss</span> <span class="o">=</span> <span class="mf">1e6</span>
+        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_epochs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vprint</span><span class="p">(</span><span class="s1">&#39;======== Epoch </span><span class="si">{:}</span><span class="s1"> / </span><span class="si">{:}</span><span class="s1"> ========&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_epochs</span><span class="p">))</span>
+
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">texts</span><span class="p">,</span> <span class="n">label_encodings</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_data_loader</span><span class="p">):</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding_method</span> <span class="o">==</span> <span class="s2">&quot;semantic&quot;</span><span class="p">:</span>
+                    <span class="n">label_encodings</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">label_encodings</span><span class="p">)</span>
+                <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">texts</span><span class="p">),</span> <span class="n">label_encodings</span><span class="p">)</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+                <span class="n">train_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+                <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+            <span class="c1"># Perform the validation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">texts</span><span class="p">,</span> <span class="n">label_encodings</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">val_data_loader</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding_method</span> <span class="o">==</span> <span class="s2">&quot;semantic&quot;</span><span class="p">:</span>
+                        <span class="n">label_encodings</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">label_encodings</span><span class="p">)</span>
+                    <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">texts</span><span class="p">),</span> <span class="n">label_encodings</span><span class="p">)</span>
+                    <span class="n">val_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+                    <span class="n">valid_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+            <span class="n">avg_train_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">train_losses</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">avg_valid_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">valid_losses</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vprint</span><span class="p">(</span>
+                <span class="s2">&quot;Training set loss: </span><span class="si">{}</span><span class="s2"> / Val loss: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">avg_train_losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">avg_valid_losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">)</span>
+            <span class="c1"># Early Stopping</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_early_stopping</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">avg_valid_losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">best_loss</span><span class="p">:</span>
+                    <span class="n">remaining_patience</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">best_loss</span> <span class="o">=</span> <span class="n">avg_valid_losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">remaining_patience</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_patience</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_best_model_state_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">remaining_patience</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">vprint</span><span class="p">(</span><span class="s2">&quot;There were no improvements after </span><span class="si">{}</span><span class="s2"> rounds. Stopping.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_patience</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_best_model_state_dict</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+    <span class="k">def</span> <span class="nf">split_train_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">YAFALDataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">YAFALDataset</span><span class="p">,</span> <span class="n">YAFALDataset</span><span class="p">]:</span>
+        <span class="n">x_train</span> <span class="o">=</span> <span class="n">YAFALDataset</span><span class="p">()</span>
+        <span class="n">x_validation</span> <span class="o">=</span> <span class="n">YAFALDataset</span><span class="p">()</span>
+        <span class="n">train_indexes</span><span class="p">,</span> <span class="n">validation_indexes</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split_indexes</span><span class="p">(</span><span class="n">ratio</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_val_ratio</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sample_index</span> <span class="ow">in</span> <span class="n">train_indexes</span><span class="p">:</span>
+            <span class="n">sample</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">is_corrupted</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">sample_index</span><span class="p">]</span>
+            <span class="n">x_train</span><span class="o">.</span><span class="n">add_sample</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">sample</span><span class="p">,</span> <span class="n">sample_labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">is_corrupted</span><span class="o">=</span><span class="n">is_corrupted</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sample_index</span> <span class="ow">in</span> <span class="n">validation_indexes</span><span class="p">:</span>
+            <span class="n">sample</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">is_corrupted</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">sample_index</span><span class="p">]</span>
+            <span class="n">x_validation</span><span class="o">.</span><span class="n">add_sample</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">sample</span><span class="p">,</span> <span class="n">sample_labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">is_corrupted</span><span class="o">=</span><span class="n">is_corrupted</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">x_validation</span>
+
+    <span class="k">def</span> <span class="nf">__freeze_label_encoder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_freeze_encoder</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">label_bert</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+                <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">__freeze_encoder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_freeze_sequence_encoder</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">bert</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+                <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding_method</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+            <span class="n">codified_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+            <span class="n">label_encoding</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">(</span><span class="n">codified_labels</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">label_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_encoder</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">label_encoding</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_best_model_state_dict</span><span class="p">)</span>
+        <span class="c1"># Remove intermediate model to lighten the saved item</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_best_model_state_dict</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># a = YAFALRegression(&quot;binary&quot;, batch_size=50, freeze_sequence_encoder=True, max_epochs=10)</span>
+    <span class="c1"># dt = YAFALDataset()</span>
+    <span class="c1"># for i in range(340):</span>
+    <span class="c1">#     dt.add_sample(&quot;this is a test&quot;, [1], 0)</span>
+    <span class="c1"># for i in range(340):</span>
+    <span class="c1">#     dt.add_sample(&quot;Like a fish in a fishbowl&quot;, [0], 0)</span>
+    <span class="c1"># a.fit(dt, None)</span>
+    <span class="c1"># import time</span>
+    <span class="c1"># initial_time = time.time()</span>
+    <span class="c1"># for i in range(100):</span>
+    <span class="c1">#     prediction = a.predict([&quot;Like a fish in a fishbowl&quot;], [0])</span>
+    <span class="c1"># print(f&quot;Average time per execution: {(time.time()-initial_time)/100}&quot;)</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">YAFALRegression</span><span class="p">(</span><span class="s2">&quot;semantic&quot;</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">freeze_sequence_encoder</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                        <span class="n">freeze_label_encoder</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">YAFALDataset</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">340</span><span class="p">):</span>
+        <span class="n">dt</span><span class="o">.</span><span class="n">add_sample</span><span class="p">(</span><span class="s2">&quot;this is a test&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;hola&quot;</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">340</span><span class="p">):</span>
+        <span class="n">dt</span><span class="o">.</span><span class="n">add_sample</span><span class="p">(</span><span class="s2">&quot;Like a fish in a fishbowl&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;adios&quot;</span><span class="p">])</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">descriptors</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;hola&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;saludar&quot;</span><span class="p">,</span> <span class="s2">&quot;bienvenida&quot;</span><span class="p">,</span> <span class="s2">&quot;hospitalidad&quot;</span><span class="p">],</span> <span class="s2">&quot;adios&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;despedida&quot;</span><span class="p">,</span> <span class="s2">&quot;rechazo&quot;</span><span class="p">]})</span>
+
+    <span class="kn">import</span> <span class="nn">time</span>
+
+    <span class="n">initial_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+        <span class="n">prediction</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="s2">&quot;Like a fish in a fishbowl&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;hola&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average time per execution: </span><span class="si">{</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">initial_time</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">YAFAL: You Are Fake Labels!  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">yafal.regression</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Manex Serras (mserras001@gmail.com/manex@seedtag.com).
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+  </body>
+</html>

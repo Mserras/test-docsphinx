@@ -1,0 +1,352 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Main Classes &#8212; YAFAL! v1.0.0  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bizstyle.css" />
+    
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="YAFAL! You Are Fake Labels!" href="../index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../index.html" title="YAFAL! You Are Fake Labels!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">YAFAL! v1.0.0  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Main Classes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="main-classes">
+<span id="main"></span><h1>Main Classes<a class="headerlink" href="#main-classes" title="Permalink to this headline">¶</a></h1>
+<section id="data-handlers">
+<h2>Data handlers<a class="headerlink" href="#data-handlers" title="Permalink to this headline">¶</a></h2>
+<section id="yafal-dataset">
+<span id="id1"></span><h3>YAFAL Dataset<a class="headerlink" href="#yafal-dataset" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="yafal.YAFALDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yafal.</span></span><span class="sig-name descname"><span class="pre">YAFALDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_corrupted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafal/models.html#YAFALDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.YAFALDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataset model to handle the required transformations in YAFAL!</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yafal.YAFALDataset.add_sample">
+<span class="sig-name descname"><span class="pre">add_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_corrupted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/yafal/models.html#YAFALDataset.add_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.YAFALDataset.add_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a sample to the dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – Sample to add</p></li>
+<li><p><strong>sample_labels</strong> (<em>List</em><em>[</em><em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>]</em><em>]</em>) – List of the labels associated to this sample. The list should contain only one item for single-label
+settings, else, more.</p></li>
+<li><p><strong>is_corrupted</strong> (<em>int</em><em>, </em><em>default = 0</em>) – If the sample is corrupted (wrong label) or not. 0 if OK, 1 if corrupted.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafal.YAFALDataset.split_indexes">
+<span class="sig-name descname"><span class="pre">split_indexes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/yafal/models.html#YAFALDataset.split_indexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.YAFALDataset.split_indexes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split the dataset according to a given ratio and returns the split indexes</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="dataset-corruptor">
+<span id="id2"></span><h3>Dataset Corruptor<a class="headerlink" href="#dataset-corruptor" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="yafal.DatasetCorruptor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yafal.</span></span><span class="sig-name descname"><span class="pre">DatasetCorruptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_labels_to_corrupt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafal/corruption.html#DatasetCorruptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.DatasetCorruptor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="yafal.DatasetCorruptor.flip_labels">
+<span class="sig-name descname"><span class="pre">flip_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/yafal/corruption.html#DatasetCorruptor.flip_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.DatasetCorruptor.flip_labels" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>original_labels</strong> – </p></li>
+<li><p><strong>available_labels</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafal.DatasetCorruptor.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#yafal.YAFALDataset" title="yafal.models.YAFALDataset"><span class="pre">yafal.models.YAFALDataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#yafal.YAFALDataset" title="yafal.models.YAFALDataset"><span class="pre">yafal.models.YAFALDataset</span></a></span></span><a class="reference internal" href="../_modules/yafal/corruption.html#DatasetCorruptor.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.DatasetCorruptor.transform" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>YAFALCorruptedDataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="torch-dataset-handler">
+<h3>Torch Dataset Handler<a class="headerlink" href="#torch-dataset-handler" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="yafal.YAFALTorchDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yafal.</span></span><span class="sig-name descname"><span class="pre">YAFALTorchDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#yafal.YAFALDataset" title="yafal.models.YAFALDataset"><span class="pre">yafal.models.YAFALDataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_encoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'binary'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafal/regression.html#YAFALTorchDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.YAFALTorchDataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="label-encoding">
+<h3>Label Encoding<a class="headerlink" href="#label-encoding" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="label-encoder"></span><dl class="py class">
+<dt class="sig sig-object py" id="yafal.YAFALLabelEncoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yafal.</span></span><span class="sig-name descname"><span class="pre">YAFALLabelEncoder</span></span><a class="reference internal" href="../_modules/yafal/label.html#YAFALLabelEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.YAFALLabelEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the semantic encoding of the labels for the YAFAL regressors</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="yafal.YAFALLabelEncoder.describe">
+<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separator_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'</span> <span class="pre">[SEP]</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_descriptors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/yafal/label.html#YAFALLabelEncoder.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.YAFALLabelEncoder.describe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the description of the given labels for semantic encoding in LLM.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Currently it does not support multi-label description. I still have my doubts if in a multi-label
+setup if a micro or macro corruption method should be taken into account.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>labels</strong> (<em>list</em>) – <p>List of labels to encode:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">labels</span> <span class="pre">=</span> <span class="pre">[1,</span> <span class="pre">0</span> <span class="pre">,</span> <span class="pre">0,</span> <span class="pre">1,</span> <span class="pre">1]</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">labels</span> <span class="pre">=</span> <span class="pre">[&quot;hi&quot;,</span> <span class="pre">&quot;bye&quot;</span> <span class="pre">,</span> <span class="pre">&quot;hi&quot;,</span> <span class="pre">&quot;bye&quot;,</span> <span class="pre">&quot;hi&quot;]</span></code></p>
+</div></blockquote>
+</p></li>
+<li><p><strong>separator_token</strong> (<em>str</em><em>, </em><em>default=&quot;</em><em> [</em><em>SEP</em><em>] </em><em>&quot;</em>) – Separator token to join the different descriptions given for each label. Currently, the separator used for
+BERT is used.</p></li>
+<li><p><strong>max_descriptors</strong> (<em>int</em><em>, </em><em>default=5</em>) – Amount of descriptors to use to describe a label</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of strings describing each one of the labels</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafal.YAFALLabelEncoder.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_descriptors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/yafal/label.html#YAFALLabelEncoder.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.YAFALLabelEncoder.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds the YAFAL Label Encoder with the required labels and optionally with the label descriptors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>labels</strong> (<em>list</em><em>, </em><em>list of integers of strings</em>) – List of labels to train the YAFAL Label Encoder</p></li>
+<li><p><strong>label_descriptors</strong> (<em>optional</em><em>, </em><em>dictionary with the label descriptors</em>) – Dictionary of type <code class="docutils literal notranslate"><span class="pre">{label:</span> <span class="pre">[descriptor_text,</span> <span class="pre">descriptor_text2,</span> <span class="pre">...]}</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafal.YAFALLabelEncoder.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../_modules/yafal/label.html#YAFALLabelEncoder.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.YAFALLabelEncoder.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of labels, composed either of integers, strings or lists (for multilabel)
+and returns the numpy array representation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>labels</strong> (<em>list</em>) – List of labels, they can be of type int, str or nested for multi-label classifiers
+<code class="docutils literal notranslate"><span class="pre">labels</span> <span class="pre">=</span> <span class="pre">[1,</span> <span class="pre">0</span> <span class="pre">,</span> <span class="pre">0,</span> <span class="pre">1,</span> <span class="pre">1]</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>label_array</strong> – Label array</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ndarray of shape (n_samples, n_labels)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafal.YAFALLabelEncoder.update_descriptors">
+<span class="sig-name descname"><span class="pre">update_descriptors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_identifier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/yafal/label.html#YAFALLabelEncoder.update_descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.YAFALLabelEncoder.update_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the descriptors of a label identifier</p>
+<p>:param : Identifier of the label to update, it must be available in the label map
+:type : param label_identifier: str
+:param :
+:type : param descriptors: list, List of strings used to describe the label</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafal.YAFALLabelEncoder.validate_descriptions">
+<span class="sig-name descname"><span class="pre">validate_descriptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/yafal/label.html#YAFALLabelEncoder.validate_descriptions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.YAFALLabelEncoder.validate_descriptions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that all the labels have the required semantic description</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If the descriptions are valid or not</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>return: bool,</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="yafal-regression">
+<h2>YAFAL Regression<a class="headerlink" href="#yafal-regression" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="regression"></span><dl class="py class">
+<dt class="sig sig-object py" id="yafal.YAFALRegression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yafal.</span></span><span class="sig-name descname"><span class="pre">YAFALRegression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_encoder_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrupt_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_original</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_labels_to_corrupt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_corpus_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_epochs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cpu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freeze_label_encoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freeze_sequence_encoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stopping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patience</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">yafal_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafal/regression.html#YAFALRegression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.YAFALRegression" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<section id="yafal-semantic">
+<h3>YAFAL Semantic<a class="headerlink" href="#yafal-semantic" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="yafal.SemanticYAFAL">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yafal.</span></span><span class="sig-name descname"><span class="pre">SemanticYAFAL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'distilbert-base-uncased'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_sequence_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_label_encoding_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlp_layer_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(150,)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm_output_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">768</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_encoding_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">768</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafal/regression/semantic.html#SemanticYAFAL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.SemanticYAFAL" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="yafal.SemanticYAFAL.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafal/regression/semantic.html#SemanticYAFAL.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.SemanticYAFAL.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="yafal-binary">
+<h3>YAFAL Binary<a class="headerlink" href="#yafal-binary" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="yafal.BinaryYAFAL">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yafal.</span></span><span class="sig-name descname"><span class="pre">BinaryYAFAL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_encoding_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained_model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'distilbert-base-uncased'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlp_layer_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(150,)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm_output_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">768</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafal/regression/binary.html#BinaryYAFAL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.BinaryYAFAL" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="yafal.BinaryYAFAL.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafal/regression/binary.html#BinaryYAFAL.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafal.BinaryYAFAL.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<p>from .regression import YAFALDataset, , YAFALRegression, BinaryYAFAL</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Main Classes</a><ul>
+<li><a class="reference internal" href="#data-handlers">Data handlers</a><ul>
+<li><a class="reference internal" href="#yafal-dataset">YAFAL Dataset</a></li>
+<li><a class="reference internal" href="#dataset-corruptor">Dataset Corruptor</a></li>
+<li><a class="reference internal" href="#torch-dataset-handler">Torch Dataset Handler</a></li>
+<li><a class="reference internal" href="#label-encoding">Label Encoding</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#yafal-regression">YAFAL Regression</a><ul>
+<li><a class="reference internal" href="#yafal-semantic">YAFAL Semantic</a></li>
+<li><a class="reference internal" href="#yafal-binary">YAFAL Binary</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="../index.html"
+                          title="previous chapter">YAFAL! You Are Fake Labels!</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/sections/main_classes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../index.html" title="YAFAL! You Are Fake Labels!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">YAFAL! v1.0.0  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Main Classes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Manex Serras (mserras001@gmail.com/manex@seedtag.com).
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+  </body>
+</html>

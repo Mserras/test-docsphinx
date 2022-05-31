@@ -1,0 +1,443 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>YAFAL! You Are Fake Labels! &#8212; YAFAL! v1.0.0  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Main Classes" href="sections/main_classes.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="sections/main_classes.html" title="Main Classes"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">YAFAL! v1.0.0  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">YAFAL! You Are Fake Labels!</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="yafal-you-are-fake-labels">
+<h1>YAFAL! You Are Fake Labels!<a class="headerlink" href="#yafal-you-are-fake-labels" title="Permalink to this headline">¶</a></h1>
+<p>Having good datasets is the main key for building good ML models. And <em>everyone</em> loves a good ML model.
+Sadly, correctly labeled datasets are scarce in practice (and I mean in the <em>real world</em>). Let’s assume it, Turkers often
+do the minimum effort possible, and wrong-labelled data happens.</p>
+<p>YAFAL is focused for the <strong>NLP text classification</strong> tasks, it’s goal is to employ the Large Language Models (such as BERT) to exploit the
+semantics representation of the input, and, optionally, of the labels to improve the detection of corrupted samples.</p>
+<p>The current backend for YAFAL! is:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://pytorch.org/">PyTorch</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/">Huggingface 🤗</a></p></li>
+</ul>
+</div></blockquote>
+<section id="methodology-pipeline">
+<h2>Methodology &amp; Pipeline:<a class="headerlink" href="#methodology-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>YAFAL! implements different Regression methods to weight if a given text sample is
+correctly labelled or not. The output will be 1 if the sample is wrong and 0 if it’s label is correct.</p>
+<p>The methodology is quite simple, the goal is to learn to relate a Large Language Model’s representation (e.g. BERT)
+and the label representation, to detect miss-labeled samples.</p>
+<p>YAFAL! can handle two different label representations:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Binary</strong>: the labels are represented as a binary vector of 1’s and 0’s</p></li>
+<li><p><strong>Semantic</strong>: the labels are described as a list of texts, which will be transformed into a distributed semantic representation using a LLM.</p></li>
+</ul>
+</div></blockquote>
+<section id="pipeline">
+<h3>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this headline">¶</a></h3>
+<p>The following pipeline is used to train a YAFAL classifier (under the API):</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The text samples are added to a <a class="reference internal" href="sections/main_classes.html#yafal-dataset"><span class="std std-ref">YAFAL Dataset</span></a> object</p></li>
+<li><p>A <a class="reference internal" href="sections/main_classes.html#label-encoder"><span class="std std-ref">YAFALLabelEncoder</span></a> is instantiated over the received corpus</p></li>
+<li><p>The <a class="reference internal" href="sections/main_classes.html#dataset-corruptor"><span class="std std-ref">DatasetCorruptor</span></a> randomly creates corrupted samples and adds them to the dataset, creating a new YAFAL Dataset object.</p></li>
+<li><p>The <a class="reference internal" href="sections/main_classes.html#regression"><span class="std std-ref">YAFAL Regressor</span></a> is trained over the corrupted YAFAL Dataset optimizing the Binary Cross Entropy loss.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="regressors">
+<h3>Regressors<a class="headerlink" href="#regressors" title="Permalink to this headline">¶</a></h3>
+<p>Depending on which label representation method is chosen, the regression pipelines will differ slightly:</p>
+<img alt="_images/yafal.drawio.png" src="_images/yafal.drawio.png" />
+<p>Overall, the same mechanism is used per each classification pipeline:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The received text is</p></li>
+</ul>
+</div></blockquote>
+<p>Navigate to <a class="reference internal" href="sections/main_classes.html#main"><span class="std std-ref">Main Classes</span></a> to check the most important classes.</p>
+</section>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>This corpus has been validated using the <a class="reference external" href="https://www.kaggle.com/datasets/amananandrai/ag-news-classification-dataset">AG News dataset</a>.
+The goal is to classify a given text in</p>
+<section id="binary">
+<h3>Binary<a class="headerlink" href="#binary" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">yafal</span> <span class="kn">import</span> <span class="n">YAFALDataset</span><span class="p">,</span> <span class="n">YAFALRegression</span>
+<span class="kn">from</span> <span class="nn">yafal.corruption</span> <span class="kn">import</span> <span class="n">DatasetCorruptor</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">precision_score</span><span class="p">,</span> <span class="n">recall_score</span>
+
+<span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">train_csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;train.csv&#39;</span><span class="p">)</span>
+<span class="n">test_csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;test.csv&#39;</span><span class="p">)</span>
+
+<span class="n">train_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">train_csv_path</span><span class="p">)</span>
+<span class="n">test_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">test_csv_path</span><span class="p">)</span>
+
+<span class="n">topic_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;world&#39;</span><span class="p">,</span>
+                 <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;sports&#39;</span><span class="p">,</span>
+                 <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;business&#39;</span><span class="p">,</span>
+                 <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;science&#39;</span><span class="p">}</span>
+
+<span class="n">train_yafal_dataset</span> <span class="o">=</span> <span class="n">YAFALDataset</span><span class="p">()</span>
+<span class="n">total_samples</span> <span class="o">=</span> <span class="mi">10000</span>  <span class="c1"># To make everything faster</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">train_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">index_label</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;Class Index&#39;</span><span class="p">]</span>
+    <span class="n">news_article</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;Title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;Description&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">train_yafal_dataset</span><span class="o">.</span><span class="n">add_sample</span><span class="p">(</span>
+        <span class="n">text</span><span class="o">=</span><span class="n">news_article</span><span class="p">,</span>
+        <span class="n">sample_labels</span><span class="o">=</span><span class="p">[</span><span class="n">index_label</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="c1"># For speedup</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">total_samples</span><span class="p">:</span>
+        <span class="k">break</span>
+
+<span class="c1"># Train our model</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Let&#39;s train our YAFAL Regressor&quot;</span><span class="p">)</span>
+<span class="n">yafal_regression</span> <span class="o">=</span> <span class="n">YAFALRegression</span><span class="p">(</span><span class="n">label_encoder_method</span><span class="o">=</span><span class="s2">&quot;binary&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">yafal_regression</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_yafal_dataset</span><span class="p">)</span>
+
+<span class="c1"># Save the model</span>
+
+<span class="n">yafal_regression</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;YAFAL_ag_semantic_model.pck&quot;</span><span class="p">)</span>
+
+<span class="c1"># Test the model - Load a new YAFAL dataset for the test</span>
+<span class="n">test_yafal_dataset</span> <span class="o">=</span> <span class="n">YAFALDataset</span><span class="p">()</span>
+<span class="n">total_test_samples</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">train_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">index_label</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;Class Index&#39;</span><span class="p">]</span>
+    <span class="n">news_article</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;Title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;Description&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">test_yafal_dataset</span><span class="o">.</span><span class="n">add_sample</span><span class="p">(</span>
+        <span class="n">text</span><span class="o">=</span><span class="n">news_article</span><span class="p">,</span>
+        <span class="n">sample_labels</span><span class="o">=</span><span class="p">[</span><span class="n">index_label</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">total_test_samples</span><span class="p">:</span>
+        <span class="k">break</span>
+
+<span class="c1"># Corrupt the dataset</span>
+<span class="n">corruptor</span> <span class="o">=</span> <span class="n">DatasetCorruptor</span><span class="p">()</span>
+<span class="n">corrupted_test_dataset</span> <span class="o">=</span> <span class="n">corruptor</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_yafal_dataset</span><span class="p">)</span>
+
+<span class="c1"># Predict with our model</span>
+<span class="n">y_true</span><span class="p">,</span> <span class="n">y_predicted</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">sample</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">is_corrupted</span> <span class="ow">in</span> <span class="n">corrupted_test_dataset</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">yafal_regression</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="n">sample</span><span class="p">],</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+    <span class="n">y_true</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">is_corrupted</span><span class="p">)</span>
+    <span class="n">y_predicted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+<span class="n">y_predicted_class</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">if</span> <span class="n">predict</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="k">else</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">predict</span> <span class="ow">in</span> <span class="n">y_predicted</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Accuracy score: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_predicted_class</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Precision score: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">precision_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_predicted_class</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Recall score: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">recall_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_predicted_class</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ROC AUC score: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>The results obtained after 10 epochs are:</p>
+<table class="colwidths-given docutils align-default" id="id1">
+<caption><span class="caption-text">Semantic results - AG News Example</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Training Loss</p></th>
+<th class="head"><p>Val Loss</p></th>
+<th class="head"><p>Accuracy</p></th>
+<th class="head"><p>Precision</p></th>
+<th class="head"><p>Recall</p></th>
+<th class="head"><p>ROC AUC</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0.2465</p></td>
+<td><p>0.2817</p></td>
+<td><p>0.9490</p></td>
+<td><p>0.9177</p></td>
+<td><p>0.8523</p></td>
+<td><p>0.9700</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="semantic">
+<h3>Semantic<a class="headerlink" href="#semantic" title="Permalink to this headline">¶</a></h3>
+<p>As it can be seen, this module learns from examples, as done in other platforms as RASA.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">yafal</span> <span class="kn">import</span> <span class="n">YAFALDataset</span><span class="p">,</span> <span class="n">YAFALRegression</span>
+<span class="kn">from</span> <span class="nn">yafal.corruption</span> <span class="kn">import</span> <span class="n">DatasetCorruptor</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">precision_score</span><span class="p">,</span> <span class="n">recall_score</span>
+
+<span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">train_csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;train.csv&#39;</span><span class="p">)</span>
+<span class="n">test_csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;test.csv&#39;</span><span class="p">)</span>
+
+<span class="n">train_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">train_csv_path</span><span class="p">)</span>
+<span class="n">test_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">test_csv_path</span><span class="p">)</span>
+
+<span class="n">topic_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;world&#39;</span><span class="p">,</span>
+                 <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;sports&#39;</span><span class="p">,</span>
+                 <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;business&#39;</span><span class="p">,</span>
+                 <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;science&#39;</span><span class="p">}</span>
+
+<span class="n">train_yafal_dataset</span> <span class="o">=</span> <span class="n">YAFALDataset</span><span class="p">()</span>
+<span class="n">total_samples</span> <span class="o">=</span> <span class="mi">10000</span>  <span class="c1"># To make everything faster</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">train_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">index_label</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;Class Index&#39;</span><span class="p">]</span>
+    <span class="n">string_label</span> <span class="o">=</span> <span class="n">topic_mapping</span><span class="p">[</span><span class="n">index_label</span><span class="p">]</span>
+    <span class="n">news_article</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;Title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;Description&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">train_yafal_dataset</span><span class="o">.</span><span class="n">add_sample</span><span class="p">(</span>
+        <span class="n">text</span><span class="o">=</span><span class="n">news_article</span><span class="p">,</span>
+        <span class="n">sample_labels</span><span class="o">=</span><span class="p">[</span><span class="n">string_label</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="c1"># For speedup</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">total_samples</span><span class="p">:</span>
+        <span class="k">break</span>
+
+<span class="c1"># Train our model</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Let&#39;s train our YAFAL Regressor&quot;</span><span class="p">)</span>
+<span class="n">yafal_regression</span> <span class="o">=</span> <span class="n">YAFALRegression</span><span class="p">(</span><span class="n">label_encoder_method</span><span class="o">=</span><span class="s2">&quot;semantic&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">yafal_regression</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_yafal_dataset</span><span class="p">,</span>
+                     <span class="n">descriptors</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;world&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;politics&quot;</span><span class="p">,</span> <span class="s2">&quot;international&quot;</span><span class="p">,</span> <span class="s2">&quot;global&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">],</span>
+                                  <span class="s2">&quot;sports&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;soccer&quot;</span><span class="p">,</span> <span class="s2">&quot;basketball&quot;</span><span class="p">,</span> <span class="s2">&quot;sport&quot;</span><span class="p">,</span> <span class="s2">&quot;workout&quot;</span><span class="p">,</span> <span class="s2">&quot;gym&quot;</span><span class="p">],</span>
+                                  <span class="s2">&quot;business&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;economics&quot;</span><span class="p">,</span> <span class="s2">&quot;trade&quot;</span><span class="p">,</span> <span class="s2">&quot;money&quot;</span><span class="p">,</span> <span class="s2">&quot;business&quot;</span><span class="p">],</span>
+                                  <span class="s2">&quot;science&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;science&quot;</span><span class="p">,</span> <span class="s2">&quot;technology&quot;</span><span class="p">,</span> <span class="s2">&quot;innovation&quot;</span><span class="p">,</span> <span class="s2">&quot;research&quot;</span><span class="p">]})</span>
+
+<span class="c1"># Save the model</span>
+
+<span class="n">yafal_regression</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;YAFAL_ag_semantic_model.pck&quot;</span><span class="p">)</span>
+
+<span class="c1"># Test the model - Load a new YAFAL dataset for the test</span>
+<span class="n">test_yafal_dataset</span> <span class="o">=</span> <span class="n">YAFALDataset</span><span class="p">()</span>
+<span class="n">total_test_samples</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">train_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">index_label</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;Class Index&#39;</span><span class="p">]</span>
+    <span class="n">string_label</span> <span class="o">=</span> <span class="n">topic_mapping</span><span class="p">[</span><span class="n">index_label</span><span class="p">]</span>
+    <span class="n">news_article</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;Title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;Description&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">test_yafal_dataset</span><span class="o">.</span><span class="n">add_sample</span><span class="p">(</span>
+        <span class="n">text</span><span class="o">=</span><span class="n">news_article</span><span class="p">,</span>
+        <span class="n">sample_labels</span><span class="o">=</span><span class="p">[</span><span class="n">string_label</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">total_test_samples</span><span class="p">:</span>
+        <span class="k">break</span>
+
+<span class="c1"># Corrupt the dataset</span>
+<span class="n">corruptor</span> <span class="o">=</span> <span class="n">DatasetCorruptor</span><span class="p">()</span>
+<span class="n">corrupted_test_dataset</span> <span class="o">=</span> <span class="n">corruptor</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_yafal_dataset</span><span class="p">)</span>
+
+<span class="c1"># Predict with our model</span>
+<span class="n">y_true</span><span class="p">,</span> <span class="n">y_predicted</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">sample</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">is_corrupted</span> <span class="ow">in</span> <span class="n">corrupted_test_dataset</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">yafal_regression</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="n">sample</span><span class="p">],</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+    <span class="n">y_true</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">is_corrupted</span><span class="p">)</span>
+    <span class="n">y_predicted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+<span class="n">y_predicted_class</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">if</span> <span class="n">predict</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="k">else</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">predict</span> <span class="ow">in</span> <span class="n">y_predicted</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Accuracy score: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_predicted_class</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Precision score: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">precision_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_predicted_class</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Recall score: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">recall_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_predicted_class</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ROC AUC score: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_predicted</span><span class="p">)))</span>
+</pre></div>
+</div>
+<p>The results obtained after 10 epochs are:</p>
+<table class="colwidths-given docutils align-default" id="id2">
+<caption><span class="caption-text">Semantic results - AG News Example</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Training Loss</p></th>
+<th class="head"><p>Val Loss</p></th>
+<th class="head"><p>Accuracy</p></th>
+<th class="head"><p>Precision</p></th>
+<th class="head"><p>Recall</p></th>
+<th class="head"><p>ROC AUC</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0.2177</p></td>
+<td><p>0.2194</p></td>
+<td><p>0.9269</p></td>
+<td><p>0.8682</p></td>
+<td><p>0.7986</p></td>
+<td><p>0.9516</p></td>
+</tr>
+</tbody>
+</table>
+<p>Surprisingly, the validation error is lower in the Semantic version but the achieved results are slightly worse.</p>
+</section>
+</section>
+<section id="future-work-open-tasks">
+<h2>Future work &amp; Open tasks<a class="headerlink" href="#future-work-open-tasks" title="Permalink to this headline">¶</a></h2>
+<p>Currently, these are the existing limitations and things to do, help is appreciated:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Multi-label fake-label detection is only supported for the “binary” encoding method.</p></li>
+<li><dl class="simple">
+<dt>Dataset Corruption:</dt><dd><ul>
+<li><p>No data-conditioning exists, i.e. P(X, Y_corrupt) = P(X)P(Y_corrupt)</p></li>
+<li><p>There is no method to take into account a label-corruption confusion matrix: P(y_c | y))</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Export to ONNX yet to be done</p></li>
+<li><p>Sphinx Documentation</p></li>
+<li><p>YAFALDocumentHandler</p></li>
+<li><p>Test it on GPU settings</p></li>
+<li><p>More validations</p></li>
+<li><p>Unit testing (in progress)</p></li>
+<li><p>Integration testing (in progress)</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sections/main_classes.html">Main Classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sections/main_classes.html#data-handlers">Data handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sections/main_classes.html#yafal-regression">YAFAL Regression</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="#">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">YAFAL! You Are Fake Labels!</a><ul>
+<li><a class="reference internal" href="#methodology-pipeline">Methodology &amp; Pipeline:</a><ul>
+<li><a class="reference internal" href="#pipeline">Pipeline</a></li>
+<li><a class="reference internal" href="#regressors">Regressors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#binary">Binary</a></li>
+<li><a class="reference internal" href="#semantic">Semantic</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#future-work-open-tasks">Future work &amp; Open tasks</a></li>
+<li><a class="reference internal" href="#contents">Contents</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="sections/main_classes.html"
+                          title="next chapter">Main Classes</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="sections/main_classes.html" title="Main Classes"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">YAFAL! v1.0.0  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">YAFAL! You Are Fake Labels!</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Manex Serras (mserras001@gmail.com/manex@seedtag.com).
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+  </body>
+</html>

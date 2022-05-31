@@ -1,0 +1,162 @@
+.. YAFAL: You Are Fake Labels! documentation master file, created by
+   sphinx-quickstart on Fri May  6 10:06:25 2022.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+===========================
+YAFAL! You Are Fake Labels!
+===========================
+
+Having good datasets is the main key for building good ML models. And *everyone* loves a good ML model.
+Sadly, correctly labeled datasets are scarce in practice (and I mean in the *real world*). Let's assume it, Turkers often
+do the minimum effort possible, and wrong-labelled data happens.
+
+YAFAL is focused for the **NLP text classification** tasks, it's goal is to employ the Large Language Models (such as BERT) to exploit the
+semantics representation of the input, and, optionally, of the labels to improve the detection of corrupted samples.
+
+The current backend for YAFAL! is:
+
+   - `PyTorch <https://pytorch.org/>`_
+   - `Huggingface 🤗 <https://huggingface.co/>`_
+
+Methodology & Pipeline:
+=======================
+
+YAFAL! implements different Regression methods to weight if a given text sample is
+correctly labelled or not. The output will be 1 if the sample is wrong and 0 if it's label is correct.
+
+The methodology is quite simple, the goal is to learn to relate a Large Language Model's representation (e.g. BERT)
+and the label representation, to detect miss-labeled samples.
+
+.. note:
+   YAFAL! requires a gold standard dataset to correctly learn these representations
+
+YAFAL! can handle two different label representations:
+
+   - **Binary**: the labels are represented as a binary vector of 1's and 0's
+   - **Semantic**: the labels are described as a list of texts, which will be transformed into a distributed semantic representation using a LLM.
+
+Pipeline
+--------
+
+The following pipeline is used to train a YAFAL classifier (under the API):
+
+   - The text samples are added to a :ref:`YAFAL Dataset <yafal dataset>` object
+   - A :ref:`YAFALLabelEncoder <label encoder>` is instantiated over the received corpus
+   - The :ref:`DatasetCorruptor <dataset corruptor>` randomly creates corrupted samples and adds them to the dataset, creating a new YAFAL Dataset object.
+   - The :ref:`YAFAL Regressor <regression>` is trained over the corrupted YAFAL Dataset optimizing the Binary Cross Entropy loss.
+
+
+Regressors
+-----------
+
+Depending on which label representation method is chosen, the regression pipelines will differ slightly:
+
+
+.. image:: ./images/yafal.drawio.png
+
+Overall, the same mechanism is used per each classification pipeline:
+
+   - The received text is
+
+Navigate to :ref:`main` to check the most important classes.
+
+
+Examples
+========
+
+This corpus has been validated using the `AG News dataset <https://www.kaggle.com/datasets/amananandrai/ag-news-classification-dataset>`_.
+The goal is to classify a given text in
+
+
+
+
+Binary
+------
+
+.. literalinclude:: ../examples/ag_news/binary.py
+
+The results obtained after 10 epochs are:
+
+.. list-table:: Semantic results - AG News Example
+   :widths: 10 10 10 10 10 10
+   :header-rows: 1
+
+   * - Training Loss
+     - Val Loss
+     - Accuracy
+     - Precision
+     - Recall
+     - ROC AUC
+   * - 0.2465
+     - 0.2817
+     - 0.9490
+     - 0.9177
+     - 0.8523
+     - 0.9700
+
+Semantic
+--------
+
+As it can be seen, this module learns from examples, as done in other platforms as RASA.
+
+.. literalinclude:: ../examples/ag_news/semantic.py
+
+The results obtained after 10 epochs are:
+
+
+.. list-table:: Semantic results - AG News Example
+   :widths: 10 10 10 10 10 10
+   :header-rows: 1
+
+   * - Training Loss
+     - Val Loss
+     - Accuracy
+     - Precision
+     - Recall
+     - ROC AUC
+   * - 0.2177
+     - 0.2194
+     - 0.9269
+     - 0.8682
+     - 0.7986
+     - 0.9516
+
+Surprisingly, the validation error is lower in the Semantic version but the achieved results are slightly worse.
+
+Future work & Open tasks
+========================
+
+Currently, these are the existing limitations and things to do, help is appreciated:
+
+ - Multi-label fake-label detection is only supported for the "binary" encoding method.
+ - Dataset Corruption:
+      - No data-conditioning exists, i.e. P(X, Y_corrupt) = P(X)P(Y_corrupt)
+      - There is no method to take into account a label-corruption confusion matrix: P(y_c | y))
+ - Export to ONNX yet to be done
+ - Sphinx Documentation
+ - YAFALDocumentHandler
+ - Test it on GPU settings
+ - More validations
+ - Unit testing (in progress)
+ - Integration testing (in progress)
+
+Contents
+========
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   sections/main_classes
+
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+

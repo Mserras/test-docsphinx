@@ -1,0 +1,66 @@
+.. _main:
+
+============
+Main Classes
+============
+
+
+Data handlers
+=============
+
+.. _yafal dataset:
+
+YAFAL Dataset
+-------------
+
+.. autoclass:: yafal.YAFALDataset
+   :members:
+
+.. _dataset corruptor:
+
+Dataset Corruptor
+-----------------
+
+.. autoclass:: yafal.DatasetCorruptor
+   :members:
+
+Torch Dataset Handler
+---------------------
+
+.. autoclass:: yafal.YAFALTorchDataset
+   :members:
+
+
+Label Encoding
+---------------
+
+.. _label encoder:
+
+.. autoclass:: yafal.YAFALLabelEncoder
+   :members:
+
+
+
+YAFAL Regression
+================
+
+.. _regression:
+
+.. autoclass:: yafal.YAFALRegression
+   :members:
+
+YAFAL Semantic
+--------------
+
+.. autoclass:: yafal.SemanticYAFAL
+   :members:
+
+YAFAL Binary
+-------------
+
+.. autoclass:: yafal.BinaryYAFAL
+   :members:
+
+
+
+from .regression import YAFALDataset, , YAFALRegression, BinaryYAFAL

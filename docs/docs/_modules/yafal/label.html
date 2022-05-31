@@ -1,0 +1,247 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>yafal.label &#8212; YAFAL: You Are Fake Labels!  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bizstyle.css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">YAFAL: You Are Fake Labels!  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">yafal.label</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for yafal.label</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Implements the Semantic Label Encoder</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="YAFALLabelEncoder"><a class="viewcode-back" href="../../sections/main_classes.html#yafal.YAFALLabelEncoder">[docs]</a><span class="k">class</span> <span class="nc">YAFALLabelEncoder</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Performs the semantic encoding of the labels for the YAFAL regressors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the YAFAL Label Encoder Class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_indexes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__check_label_type</span><span class="p">(</span><span class="n">label_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">label_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="nb">type</span><span class="p">(</span><span class="n">label</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">label_list</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">label_types</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Only one data type is expected for labels, received: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">label_types</span><span class="p">)))</span>
+        <span class="n">label_type</span> <span class="o">=</span> <span class="n">label_types</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">label_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Label type needs to be int or str, received: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label_type</span><span class="p">))</span>
+
+<div class="viewcode-block" id="YAFALLabelEncoder.fit"><a class="viewcode-back" href="../../sections/main_classes.html#yafal.YAFALLabelEncoder.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
+            <span class="n">label_descriptors</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds the YAFAL Label Encoder with the required labels and optionally with the label descriptors</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        labels: list, list of integers of strings</span>
+<span class="sd">            List of labels to train the YAFAL Label Encoder</span>
+
+<span class="sd">        label_descriptors: optional, dictionary with the label descriptors</span>
+<span class="sd">            Dictionary of type ``{label: [descriptor_text, descriptor_text2, ...]}``</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__check_label_type</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+                <span class="c1"># The label does not exists</span>
+                <span class="n">label_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_indexes</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label_index</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">label_index</span><span class="p">,</span>
+                    <span class="s2">&quot;descriptors&quot;</span><span class="p">:</span> <span class="p">[]</span>
+                <span class="p">}</span>
+        <span class="k">if</span> <span class="n">label_descriptors</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">label_identifier</span> <span class="ow">in</span> <span class="n">label_descriptors</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">label_identifier</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">label_identifier</span><span class="p">][</span><span class="s2">&quot;descriptors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_descriptors</span><span class="p">[</span><span class="n">label_identifier</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Label &quot;</span><span class="si">{}</span><span class="s1">&quot; not found when updating descriptors.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label_identifier</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="YAFALLabelEncoder.transform"><a class="viewcode-back" href="../../sections/main_classes.html#yafal.YAFALLabelEncoder.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a list of labels, composed either of integers, strings or lists (for multilabel)</span>
+<span class="sd">        and returns the numpy array representation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        labels: list</span>
+<span class="sd">            List of labels, they can be of type int, str or nested for multi-label classifiers</span>
+<span class="sd">            ``labels = [1, 0 , 0, 1, 1]``</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        label_array : ndarray of shape (n_samples, n_labels)</span>
+<span class="sd">            Label array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">label_transform</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_indexes</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">sub_label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                    <span class="n">label_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">sub_label</span><span class="p">][</span><span class="s2">&quot;index&quot;</span><span class="p">]</span>
+                    <span class="n">label_transform</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">label_index</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">label_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]][</span><span class="s2">&quot;index&quot;</span><span class="p">]</span>
+                <span class="n">label_transform</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">label_index</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">label_transform</span></div>
+
+<div class="viewcode-block" id="YAFALLabelEncoder.describe"><a class="viewcode-back" href="../../sections/main_classes.html#yafal.YAFALLabelEncoder.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">separator_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot; [SEP] &quot;</span><span class="p">,</span>
+                 <span class="n">max_descriptors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Creates the description of the given labels for semantic encoding in LLM.</span>
+
+<span class="sd">        .. warning::</span>
+<span class="sd">            Currently it does not support multi-label description. I still have my doubts if in a multi-label</span>
+<span class="sd">            setup if a micro or macro corruption method should be taken into account.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        labels : list</span>
+<span class="sd">            List of labels to encode:</span>
+
+<span class="sd">                ``labels = [1, 0 , 0, 1, 1]``</span>
+
+<span class="sd">                ``labels = [&quot;hi&quot;, &quot;bye&quot; , &quot;hi&quot;, &quot;bye&quot;, &quot;hi&quot;]``</span>
+
+<span class="sd">        separator_token : str, default=&quot; [SEP] &quot;</span>
+<span class="sd">            Separator token to join the different descriptions given for each label. Currently, the separator used for</span>
+<span class="sd">            BERT is used.</span>
+
+<span class="sd">        max_descriptors : int, default=5</span>
+<span class="sd">            Amount of descriptors to use to describe a label</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List of strings describing each one of the labels</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">max_descriptors</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;At least one descriptor needs to be employed (max_descriptions=1)&quot;</span><span class="p">)</span>
+        <span class="n">texts_to_return</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="n">texts_to_return</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">separator_token</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="s2">&quot;descriptors&quot;</span><span class="p">][:</span><span class="n">max_descriptors</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">texts_to_return</span></div>
+
+<div class="viewcode-block" id="YAFALLabelEncoder.update_descriptors"><a class="viewcode-back" href="../../sections/main_classes.html#yafal.YAFALLabelEncoder.update_descriptors">[docs]</a>    <span class="k">def</span> <span class="nf">update_descriptors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_identifier</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">descriptors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the descriptors of a label identifier</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        :param label_identifier: str</span>
+<span class="sd">            Identifier of the label to update, it must be available in the label map</span>
+
+<span class="sd">        :param descriptors: list, List of strings used to describe the label</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">label_identifier</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Label id &quot;</span><span class="si">{}</span><span class="s1">&quot; not found in the label map.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label_identifier</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">label_identifier</span><span class="p">][</span><span class="s2">&quot;descriptors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">descriptors</span></div>
+
+<div class="viewcode-block" id="YAFALLabelEncoder.validate_descriptions"><a class="viewcode-back" href="../../sections/main_classes.html#yafal.YAFALLabelEncoder.validate_descriptions">[docs]</a>    <span class="k">def</span> <span class="nf">validate_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks that all the labels have the required semantic description</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        :return: bool,</span>
+<span class="sd">            If the descriptions are valid or not</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="s2">&quot;descriptors&quot;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">YAFAL: You Are Fake Labels!  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">yafal.label</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Manex Serras (mserras001@gmail.com/manex@seedtag.com).
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+    </div>
+  </body>
+</html>
